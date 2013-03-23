@@ -3,8 +3,7 @@
 	
 	class indexController extends controller
 	{
-		use singletonTrait;
-		use loaderTrait;
+		use singletonLoaderTrait;
 		
 		public function run()
 		{
