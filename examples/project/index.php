@@ -1,5 +1,5 @@
 <?php
-	require_once('/path/to/kit/inc/core.inc.php');
+	require_once('../../inc/core.inc.php');
 	
 	// register URLs here <path>, <controller>
 	$kit->registerUrl('/', 'index');
