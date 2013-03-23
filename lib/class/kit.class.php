@@ -9,28 +9,41 @@
 	 
 	namespace kit;
 	
-	use kit\helper\singleton;
-	
-	class kit extends singleton
+	class kit
 	{
-		protected static $instance;
+		use singletonTrait;
+		
+		/**
+		 * Keeps the current request URL
+		 * 
+		 * @var string
+		 */
 		
 		private $url;
 		
+		/**
+		 * Keeps all the parts for the current request URL
+		 * 
+		 * @var array
+		 */
+		
 		private $parts;
+		
+		/**
+		 * Keeps the depth of matching between the last registered URL and the parts of the request URL
+		 * 
+		 * @var null|int
+		 */
 		
 		private $depth = null;
 		
+		/**
+		 * controller name and/or object
+		 * 
+		 * @var mixed
+		 */
+		
 		private $controller = null;
-		
-		protected function __construct()
-		{
-			
-		}
-		
-		protected function __clone() { 
-			
-		}
 		
 		public function setup()
 		{
