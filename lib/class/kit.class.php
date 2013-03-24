@@ -9,6 +9,8 @@
 	 
 	namespace kit;
 	
+	use Exception;
+	
 	class kit
 	{
 		use singletonTrait;
@@ -45,6 +47,12 @@
 		
 		private $controller = null;
 		
+		private $view;
+		
+		private $db;
+		
+		private $cfg;
+		
 		public function setup()
 		{
 			$root_doc = $_SERVER['DOCUMENT_ROOT'];
@@ -75,17 +83,65 @@
 			
 			$this->url = $url['path'];
 			
-			$this->parts = explode('/', $this->url);
+			$this->parts = $this->getParts($this->url);
+			
+			$this->cfg = cfg::getInstance();
+			
+			if(!empty($this->cfg->db->hostname) && !empty($this->cfg->db->username) && !empty($this->cfg->db->password) && !empty($this->cfg->db->database))
+			{
+				$this->db = new db();
+			}
 			
 			return $this;
 		}
 		
+		private function getParts($url)
+		{
+			return explode('/', substr($url,1), -1);
+			
+			/*
+			if($url === '/')
+			{
+				$parts = Array('');
+			}
+			else
+			{
+				if($url[0] !== '/')
+				{
+					$url = '/'.$url;
+				}
+				
+				if(substr($url,-1,1) != '/')
+				{
+					$url .= '/';
+				}
+				
+				$parts = explode('/', $url);
+			}*/
+			
+			return $parts;
+		}
+		
 		public function registerUrl($url, $controller)
 		{
-			$parts = explode('/', substr($url,1));
+			$parts = $this->getParts($url);
+			
+			$controller = str_replace('/', '\\', $controller);
+			
+			// if the current URL is / this will result in a 0-element array
+			if(!count($parts))
+			{
+				if(!count($this->parts))
+				{
+					$this->depth = 0;
+					$this->controller = $controller;
+				}
+				
+				return;
+			}
 			
 			foreach($parts AS $depth => $part)
-			{
+			{	
 				if($part !== $this->parts[$depth])
 				{
 					break;	
@@ -106,13 +162,40 @@
 			$this->controller = call_user_func(Array($class, 'getInstance'));
 		}
 		
+		/**
+		 * Run method. This will render all the page details
+		 * 
+		 * @return void
+		 * 
+		 * @throws Exception
+		 */
+		
 		public function run()
 		{
+			if(!$this->controller instanceof controllerInterface)
+			{
+				throw new Exception('controller does not implement controllerInterface');
+			}
+			
 			$this->controller->run();
+			
+			if($this->view === null)
+			{
+				throw new Exception('no view set');
+			}
+			
 			$this->view->run();
 		}
 		
-		public function setView($view)
+		/**
+		 * Sets the current view
+		 * 
+		 * @param viewInterface View
+		 * 
+		 * @return void
+		 */
+		
+		public function setView(viewInterface $view)
 		{
 			$this->view = $view;
 		}

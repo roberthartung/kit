@@ -71,5 +71,21 @@
 	
 	spl_autoload_register('__kit_autoload');
 	
+	// As we're using constants here, we need to include the site's default first
+	if(file_exists(PATH_SITE_ROOT.'inc/defaults.inc.php'))
+	{
+		require_once(PATH_SITE_ROOT.'inc/defaults.inc.php');
+	}
+	
+	require_once(PATH_KIT_ROOT.'inc/defaults.inc.php');
+	
+	// The config uses an object, so we want to object to be created first and then be overwritten by the user's project after
+	require_once(PATH_KIT_ROOT.'cfg/default.cfg.php');
+	
+	if(file_exists(PATH_SITE_ROOT.'cfg/kit.cfg.php'))
+	{
+		require_once(PATH_SITE_ROOT.'cfg/kit.cfg.php');
+	}
+	
 	$kit = kit\kit::getInstance()->setup();
 ?>
