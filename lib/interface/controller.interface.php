@@ -1,8 +1,9 @@
 <?php
-	namespace kit\controller;
+	namespace kit;
 	
 	interface controllerInterface
 	{
 		public static function getInstance();
+		public function run();
 	}
 ?>

@@ -1,7 +1,7 @@
 <?php
 	namespace kit;
 	
-	use kit\controller\controllerInterface;
+	use kit\controllerInterface;
 	
 	abstract class controller implements controllerInterface
 	{
