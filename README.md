@@ -14,10 +14,10 @@ Let's assume you have the kit framework installed to /kit/. Then the structure m
 
 ### kit structure
 
->
-> kit/
-> > cfg/
-> > examples/
-> > inc/
-> > lib/
->
+```
+	kit/
+		cfg/
+		examples/
+		inc/
+		lib/
+```
