@@ -11,24 +11,40 @@
 		
 		private $attr;
 		
-		public function __construct(array $attr)
+		private $file_path;
+		
+		private $file_name;
+		
+		public function __construct(array $attr, $file_path, $file_name)
 		{
 			$this->attr = $attr;
+			$this->file_path = $file_path;
+			$this->file_name = $file_name;
 		}
 		
 		public function run()
 		{
-			$code = '';
+			$code = '<?php ';
 			
 			if(!isset($this->attr[0]))
 			{
-				throw new Exception;
+				throw new Exception('No path given for include command. Aborting.');
 			}
 			
-			$template = new template('tpl/'.$this->attr[0].'.tpl');
-			echo $template->get();
+			$path = $this->file_path;
+			if(array_key_exists('root', $this->attr))
+			{
+				$path = 'tpl'.DIRECTORY_SEPARATOR;
+			}
 			
-			return $code;
+			$code .= " (new kit\\template('".$path.$this->attr[0].'.tpl'."'))->get();";
+			
+			/*
+			$template = new template();
+			echo $template->get();
+			*/
+			
+			return $code.' ?>';
 		}
 	}
 ?>
