@@ -53,6 +53,8 @@
 		
 		private $cfg;
 		
+		private $parameters = Array();
+		
 		public function setup()
 		{
 			$root_doc = $_SERVER['DOCUMENT_ROOT'];
@@ -87,7 +89,7 @@
 			
 			$this->cfg = cfg::getInstance();
 			
-			if(!empty($this->cfg->db->hostname) && !empty($this->cfg->db->username) && !empty($this->cfg->db->password) && !empty($this->cfg->db->database))
+			if(!empty($this->cfg->db->hostname) && !empty($this->cfg->db->username) && !empty($this->cfg->db->database))
 			{
 				$this->db = new db();
 			}
@@ -142,9 +144,25 @@
 			
 			foreach($parts AS $depth => $part)
 			{	
-				if($part !== $this->parts[$depth])
+				// no more parts available
+				$_part = &$this->parts[$depth];
+				if(!isset($_part))
+					break;
+				
+				//var_dump($part, $this->parts[$depth]);
+				
+				if($part[0] == '%')
 				{
-					break;	
+					if(sprintf($part, $_part) != $_part)
+					{
+						break;
+					}
+					
+					$this->parameters[] = $_part;
+				}
+				elseif($part !==$_part)
+				{
+					break;
 				}
 			}
 			
@@ -157,6 +175,11 @@
 		
 		public function initController()
 		{
+			if($this->controller === null)
+			{
+				throw new Exception('No controller available. Please register a URL handler for URL "'.$this->url.'"');
+			}
+			
 			$class = 'kit\\'.$this->controller.'Controller';
 			
 			$this->controller = call_user_func(Array($class, 'getInstance'));
@@ -199,5 +222,19 @@
 		{
 			$this->view = $view;
 		}
+		
+		/**
+		 * Returns the database object
+		 */
+	 
+	  public function getDatabase()
+	  {
+	  	return $this->db;
+	  }
+	  
+	  public function getParameters()
+	  {
+	  	return $this->parameters;
+	  }
 	}
 ?>

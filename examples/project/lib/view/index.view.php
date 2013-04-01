@@ -1,7 +1,7 @@
 <?php
 	namespace kit;
 	
-	class indexView
+	class indexView extends view
 	{
 		use loaderTrait { __construct as loader; }
 		use singletonTrait;

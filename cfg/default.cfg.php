@@ -5,4 +5,5 @@
 	$cfg->db->password = null;
 	$cfg->db->hostname = null;
 	$cfg->db->database = null;
+	$cfg->db->orm = false;
 ?>
