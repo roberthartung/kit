@@ -3,17 +3,21 @@
 	
 	trait loaderTrait
 	{
-		private $kit;
+		protected $kit;
 		
-		private $template_parser;
+		protected $template_parser;
 		
-		private $cfg;
+		protected $cfg;
+		
+		protected $db;
 		
 		public function __construct()
 		{
 			$this->kit = kit::getInstance();
 			$this->cfg = cfg::getInstance();
 			$this->template_parser = template\parser::getInstance();
+			
+			$this->db = $this->kit->getDatabase();
 		}
 	}
 ?>
