@@ -9,6 +9,8 @@
 		define('PATH_KIT_LIB_CLASSES', PATH_KIT_ROOT.'lib'.DIRECTORY_SEPARATOR/*.'class'.DIRECTORY_SEPARATOR*/);
 	}
 	
+	require_once(PATH_KIT_LIB_CLASSES.'exception/filenotfound.exception.php');
+	
 	unset($files);
 	
 	set_include_path(get_include_path().PATH_SEPARATOR.
@@ -57,6 +59,11 @@
 			$class = substr($class,0,$pos);
 			$suffix = 'exception';
 		}
+		elseif(($pos = strpos($class, 'Model')) !== false)
+		{
+			$class = substr($class,0,$pos);
+			$suffix = 'model';
+		}
 		else
 		{
 			$suffix = 'class';
@@ -65,6 +72,11 @@
 		$url = $suffix.DIRECTORY_SEPARATOR.strtolower($class).'.'.$suffix.'.php';
 		
 		// var_dump($url);
+		
+		if(!file_exists(PATH_SITE_ROOT.'lib'.DIRECTORY_SEPARATOR.$url) && !file_exists(PATH_KIT_ROOT.'lib'.DIRECTORY_SEPARATOR.$url))
+		{
+			throw new kit\fileNotFoundException($url);
+		}
 		
 		require_once($url);
 	}
