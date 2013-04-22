@@ -9,6 +9,9 @@
 		define('PATH_KIT_LIB_CLASSES', PATH_KIT_ROOT.'lib'.DIRECTORY_SEPARATOR/*.'class'.DIRECTORY_SEPARATOR*/);
 	}
 	
+	$path_www = substr(str_replace(DIRECTORY_SEPARATOR, '/', PATH_SITE_ROOT), strlen($_SERVER['DOCUMENT_ROOT']));
+	define('PATH_WWW', '/'.$path_www);
+	
 	require_once(PATH_KIT_LIB_CLASSES.'exception/filenotfound.exception.php');
 	
 	unset($files);
@@ -22,11 +25,23 @@
 		// This function will only load classes from kit namespace
 		if(strpos($class,'kit\\') !== 0)
 		{
+			$class = str_replace('\\', DIRECTORY_SEPARATOR, $class);
+			
+			$path = PATH_SITE_ROOT.'lib'.DIRECTORY_SEPARATOR.'class'.DIRECTORY_SEPARATOR.$class.'.class.php';
+			
+			if(file_exists($path))
+			{
+				require_once($path);
+				return true;
+			}
+			
 			return false;
 		}
 		
-		// replace the namespace separator with directory separator and remove namespace from the beginning
 		$class = str_replace('\\', DIRECTORY_SEPARATOR, substr($class,4));
+		
+		// replace the namespace separator with directory separator and remove namespace from the beginning
+		
 		
 		if(($pos = strpos($class, 'Controller')) !== false)
 		{
