@@ -4,6 +4,7 @@
 	use PDOStatement;
 	use PDO;
 	use Iterator;
+	use Exception;
 	
 	class result implements Iterator
 	{
@@ -17,17 +18,21 @@
 		
 		private $data;
 		
-		public function __construct(PDOStatement $result)
+		private $query;
+		
+		public function __construct(PDOStatement $result, query $query = null)
 		{
 			$this->result = $result;
+			$this->query = $query;
 			$columns = Array();
 			for($c=0;$c<$result->columnCount();$c++)
 			{
 				$meta = $result->getColumnMeta($c);
 				$columns[$meta['name']] = $meta;
 			}
+			
 			// var_dump($this->result);
-			$this->data = $this->result->fetchAll(PDO::FETCH_CLASS, 'kit\\db\\result\\row', Array($columns));
+			$this->data = $this->result->fetchAll(PDO::FETCH_CLASS, 'kit\\db\\result\\row', Array($columns, $this->query));
 			
 			/*
 			for($c=0;$c<$result->columnCount();$c++)
@@ -72,9 +77,14 @@
 		}
 		*/
 		
-		public function getManipulator()
+		public function getRow($offset = 0)
 		{
+			if(!isset($this->data[$offset]))
+			{
+				throw new Exception;
+			}
 			
+			return $this->data[$offset];
 		}
 	}
 ?>

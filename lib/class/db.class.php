@@ -3,6 +3,7 @@
 	
 	use PDO;
 	use Exception;
+	use kit\db\queryException;
 	
 	class db
 	{
@@ -31,22 +32,31 @@
 		{
 			$result = call_user_func_array(Array($this->conn, $method), $args);
 			
+			if(!$result)
+			{
+				$error = $this->conn->errorInfo();
+				throw new queryException($error[2], $error[1], $args[0]);
+			}
+			
 			if($method === 'query')
 			{
+				/*
 				if(!$result->execute())
 				{
 					throw new Exception;
 				}
+				*/
 				
+				// If this was a string query
 				if(is_string($args[0]))
 				{
 					return new db\result($result);
 				}
+				elseif($args[0] instanceof db\query)
+				{
+					return new db\result($result, $args[0]);
+				}
 			}
-			
-			
-			
-			
 			
 			/*
 			if($method == 'query')
@@ -65,6 +75,33 @@
 			
 			return call_user_func_array(Array($this->conn, $method), $args);
 			*/
+		}
+		
+		/**
+		 * @todo use db\query\insert class
+		 */
+		
+		public function insert($table, array $data)
+		{
+			$columns = array_keys($data);
+			$values = Array();
+			foreach(array_values($data) AS $val)
+			{
+				if($val === null)
+				{
+					$values[] = 'NULL';
+				}
+				elseif(is_numeric($val))
+				{
+					$values[] = $val;
+				}
+				else
+				{
+					$values[] = $this->quote($val);
+				}
+			}
+			
+			return $this->conn->query("INSERT INTO ".$table." (".implode(', ', $columns).") VALUES (".implode(',', $values).")");
 		}
 	}
 ?>

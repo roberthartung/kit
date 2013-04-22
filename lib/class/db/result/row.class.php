@@ -1,37 +1,32 @@
 <?php
 	namespace kit\db\result;
 	
+	use kit\db\query\update;
+	use kit\db\query;
+	
 	class row
 	{
-		private $columns;
+		protected $columns;
 		
-		private $changed = false;
+		protected $changed = Array();
 		
-		public function __construct(array $columns)
+		protected $column_pk = null;
+		
+		private $query;
+		
+		public function __construct(array $columns, query $query = null)
 		{
 			$this->columns = $columns;
-			/*
-			foreach($this->model->getColumns() AS $col)
-			{
-				$name = $col['name'];
-				var_dump($this->$name);
-			}
-			*/
+			$this->query = $query;
 			
-			/*
-			object(kit\db\result\row)#12 (5) {
-  ["video_id"]=>
-  string(1) "1"
-  ["file_name"]=>
-  string(7) "tmp.mp4"
-  ["file_size"]=>
-  string(6) "123456"
-  ["video_length"]=>
-  string(2) "10"
-  ["status"]=>
-  string(7) "enabled"
-}
-			*/
+			foreach($this->columns AS $column_name => $column_info)
+			{
+				if(in_array('primary_key', $column_info['flags']))
+				{
+					$this->column_pk = $column_name;
+					break;
+				}
+			}
 		}
 		
 		public function __call($func, $args)
@@ -41,7 +36,11 @@
 				$col_name = substr($func,4);
 				if(array_key_exists($col_name, $this->columns))
 				{
-					$this->$col_name = $args[0];
+					if($this->$col_name != $args[0])
+					{
+						$this->$col_name = $args[0];
+						$this->changed[$col_name] = $args[0];
+					}
 					return true;
 				}
 			}
@@ -50,12 +49,57 @@
 				$col_name = substr($func,4);
 				if(array_key_exists($col_name, $this->columns))
 				{
-					$this->changed = true;
 					return $this->$col_name;
 				}
 			}
 			
 			return null;
+		}
+		
+		public function update(array $data = Array())
+		{
+			if(!count($this->changed))
+			{
+				return null;
+			}
+			
+			$data = array_merge($data, $this->changed);
+			
+			if($this->query != null)
+			{
+				if(($model = $this->query->getModel()) !== null)
+				{
+					return $model->update($data);
+				}
+			}
+			
+			/*
+			echo '<pre>';
+			
+			
+			$valid_columns = $this->columns;
+			if($this->column_pk != null)
+			{
+				unset($valid_columns[$this->column_pk]);
+			}
+			
+			$keys = array_keys($valid_columns);
+			$table_name = $valid_columns[$keys[0]]['table'];
+			var_dump($valid_columns);
+			
+			$data = array_intersect_key($data, $this->columns);
+			
+			$query = new update($table_name);
+			
+			if($this->column_pk != null)
+			{
+				$query->where(Array($this->column_pk => $this->{$this->column_pk}));
+			}
+			
+			var_dump((string) $query);
+			
+			//var_dump($this->columns);
+			*/
 		}
 	}
 ?>
