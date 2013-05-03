@@ -99,7 +99,28 @@
 		
 		private function getParts($url)
 		{
-			return explode('/', substr($url,1), -1);
+			if(strpos($url, '/') === 0)
+			{
+				$url = substr($url,1);
+			}
+			
+			if(substr($url,-1,1) === '/')
+			{
+				$url = substr($url,0,-1);
+			}
+			
+			/*
+			if($url === false)
+			{
+				$url = '';
+			}
+			*/
+			if($url === false)
+			{
+				return Array();
+			}
+			
+			return explode('/', $url); //  substr($url,1), -1
 			
 			/*
 			if($url === '/')
@@ -129,45 +150,64 @@
 			$parts = $this->getParts($url);
 			
 			$controller = str_replace('/', '\\', $controller);
-			
+
+			// var_dump($parts, $this->parts);
 			// if the current URL is / this will result in a 0-element array
-			if(!count($parts))
+			if(!count($parts) && $this->depth === null)
 			{
-				if(!count($this->parts))
-				{
+				//if(!count($this->parts))
+				//{
 					$this->depth = 0;
 					$this->controller = $controller;
-				}
+				//}
 				
 				return;
 			}
 			
-			foreach($parts AS $depth => $part)
+			$parameters = Array();
+			$depth = 0;
+			
+			//var_dump(count($parts), count($this->parts));
+			
+			foreach($parts AS $part)
 			{	
 				// no more parts available
 				$_part = &$this->parts[$depth];
+				// URL is longer than actual URL
 				if(!isset($_part))
+				{
+					//return false;
 					break;
-				
-				//var_dump($part, $this->parts[$depth]);
+				}
+				//var_dump($part, $_part);
 				
 				if($part[0] == '%')
 				{
 					if(sprintf($part, $_part) != $_part)
 					{
+						//return false;
 						break;
 					}
 					
-					$this->parameters[] = $_part;
+					$parameters[] = $_part;
 				}
-				elseif($part !==$_part)
+				elseif($part !== $_part)
 				{
+					//return false;
 					break;
 				}
+				
+				$depth++;
+			}
+			
+			if($depth != count($parts))
+			{
+				return false;
 			}
 			
 			if($this->depth === null || $depth > $this->depth)
 			{
+				$this->parameters = $parameters;
 				$this->depth = $depth;
 				$this->controller = $controller;
 			}
@@ -180,6 +220,9 @@
 				throw new Exception('No controller available. Please register a URL handler for URL "'.$this->url.'"');
 			}
 			
+			//var_dump($this->controller);
+			
+			$_GET = array_merge($_GET, $this->parameters);
 			$class = 'kit\\'.$this->controller.'Controller';
 			
 			$this->controller = call_user_func(Array($class, 'getInstance'));
@@ -202,12 +245,13 @@
 			
 			$this->controller->run();
 			
-			if($this->view === null)
+			if($this->view !== null)
 			{
-				throw new Exception('no view set');
+				
+				$this->view->BASE = PATH_WWW;
+				$this->view->run();
+				//throw new Exception('no view set');
 			}
-			
-			$this->view->run();
 		}
 		
 		/**
@@ -235,6 +279,28 @@
 	  public function getParameters()
 	  {
 	  	return $this->parameters;
+	  }
+	  
+	  public function createPrefixedClassLoader($prefix, $path, array $include_dirs = Array(), $file_ext = '.php')
+	  {
+	  	spl_autoload_register(function($class) use($prefix, $path, $file_ext, $include_dirs)
+	  	{
+	  		if(strpos($class, $prefix) !== 0)
+	  		{
+	  			return false;
+	  		}
+	  		
+	  		foreach($include_dirs AS $include_dir)
+	  		{
+	  			if(file_exists($include_dir.$class.$file_ext))
+	  			{
+	  				require_once($include_dir.$class.$file_ext);
+	  				return true;
+	  			}
+	  		}
+	  		
+	  		require_once($path.$class.$file_ext);
+	  	});
 	  }
 	}
 ?>

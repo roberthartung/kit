@@ -16,7 +16,6 @@
 			$this->kit = kit::getInstance();
 			$this->cfg = cfg::getInstance();
 			$this->template_parser = template\parser::getInstance();
-			
 			$this->db = $this->kit->getDatabase();
 		}
 	}

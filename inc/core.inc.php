@@ -1,4 +1,7 @@
 <?php
+	session_start();
+	session_name('kit.session');
+	
 	$files = get_included_files();
 	
 	define('PATH_SITE_ROOT', dirname($files[0]).DIRECTORY_SEPARATOR);
@@ -12,7 +15,8 @@
 	$path_www = substr(str_replace(DIRECTORY_SEPARATOR, '/', PATH_SITE_ROOT), strlen($_SERVER['DOCUMENT_ROOT']));
 	define('PATH_WWW', '/'.$path_www);
 	
-	require_once(PATH_KIT_LIB_CLASSES.'exception/filenotfound.exception.php');
+	require_once(PATH_KIT_LIB_CLASSES.'exception'.DIRECTORY_SEPARATOR.'filenotfound.exception.php');
+	require_once(PATH_KIT_ROOT.'lib'.DIRECTORY_SEPARATOR.'func'.DIRECTORY_SEPARATOR.'helpers.func.php');
 	
 	unset($files);
 	
