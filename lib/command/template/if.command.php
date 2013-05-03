@@ -22,7 +22,22 @@
 				}
 				elseif(isset($exp['var']))
 				{
-					$expr_str .= '$'.$exp['var'].'';
+					if(isset($exp['type']))
+					{
+						switch($exp['type'])
+						{
+							case 'object' :
+								$expr_str .= '->'.$exp['var'];
+							break;
+							case 'array' :
+								$expr_str .= '[\''.$exp['var'].'\']';
+							break;
+						}
+					}
+					else
+					{
+						$expr_str .= '$'.$exp['var'].'';
+					}
 				}
 				elseif(isset($exp['number']))
 				{

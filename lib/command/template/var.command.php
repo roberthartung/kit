@@ -14,10 +14,11 @@
 		
 		public function run()
 		{
-			$code = '<?php echo $'.$this->attr['_var']['var'];
+			$code = '<?php echo $';
 			
 			if(is_array($this->attr['_var']))
 			{
+				$code .= $this->attr['_var']['var'];
 				//var_dump($this->attr['var']);
 				// $code .= .''; // end of direct data from $template->data
 				
@@ -42,8 +43,10 @@
 						break;
 					}
 				}
-				
-				// var_dump(['var']);
+			}
+			else
+			{
+				$code .= $this->attr['_var'];
 			}
 			
 			return $code.'; ?>';

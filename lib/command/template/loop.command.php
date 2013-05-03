@@ -30,8 +30,8 @@
 					//$code .= ' var_dump($this->data[\''.$this->attr['from'].'\']); ';
 					
 					$as = array_key_exists('as', $this->attr) ? $this->attr['as'] : 'row';
-					
-					$code .= ' foreach($this->data[\''.$this->attr['from'].'\'] AS $__key => $'.$as.') {';
+				  
+					$code .= ' foreach($'.$this->attr['from'].' AS $__key => $'.$as.') {';
 				}
 			}
 			

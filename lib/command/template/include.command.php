@@ -31,13 +31,25 @@
 				throw new Exception('No path given for include command. Aborting.');
 			}
 			
+			$additional_vars = Array();
+			if(isset($this->attr['_expression']))
+			{
+				foreach($this->attr['_expression'] AS $exp)
+				{
+					if(isset($exp['var']))
+					{
+						$additional_vars[] = "'".$exp['var']."' => $".$exp['var'];
+					}
+				}
+			}
+			
 			$path = $this->file_path;
 			if(array_key_exists('root', $this->attr))
 			{
 				$path = 'tpl'.DIRECTORY_SEPARATOR;
 			}
 			
-			$code .= " (new kit\\template('".$path.$this->attr[0].'.tpl'."'))->get();";
+			$code .= " echo (new kit\\template('".$path.$this->attr[0].'.tpl'."'))->get(\$data, Array(".implode(',', $additional_vars)."));";
 			
 			/*
 			$template = new template();

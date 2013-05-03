@@ -45,12 +45,16 @@
 			$this->content = file_get_contents($this->file);
 			$this->file_path = dirname($file).DIRECTORY_SEPARATOR;
 			$this->file_name = basename($file);
-			$this->dir_cached = PATH_SITE_ROOT.'cache/'.$this->file_path;
+			$this->dir_cached = PATH_SITE_ROOT.'cache'.DIRECTORY_SEPARATOR.$this->file_path;
 			$this->path_cached = $this->dir_cached.$this->file_name;
 		}
 		
-		public function get()
+		public function get(array $data = Array(), array $data_add = Array())
 		{
+			ob_start();
+			/*
+			array $data = Array()
+			*/
 			if(!file_exists($this->dir_cached))
 			{
 				mkdir($this->dir_cached, 0777, true);
@@ -62,12 +66,23 @@
 				file_put_contents($this->path_cached, $template);
 			}
 			
+			$data = array_merge($data, $this->data, $data_add);
+			
+			/*
 			foreach($this->data AS $___k => $___v)
+			{
+				$$___k = $___v;
+			}
+			*/
+			
+			foreach($data AS $___k => $___v)
 			{
 				$$___k = $___v;
 			}
 			
 			include($this->path_cached);
+			
+			return ob_get_clean();
 		}
 	}
 ?>

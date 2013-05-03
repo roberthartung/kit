@@ -66,15 +66,17 @@
 		
 		const STATE_EXPRESSION_VAR = 6;
 		
-		const STATE_EXPRESSION_NUMBER = 7;
+		const STATE_EXPRESSION_AFTER_VAR = 7;
 		
-		const STATE_EXPRESSION_STRING = 8;
+		const STATE_EXPRESSION_NUMBER = 8;
 		
-		const STATE_VALUE = 9;
+		const STATE_EXPRESSION_STRING = 9;
 		
-		const STATE_VALUE_STRING = 10;
+		const STATE_VALUE = 10;
 		
-		const STATE_COMMAND_VAR = 11;
+		const STATE_VALUE_STRING = 11;
+		
+		const STATE_COMMAND_VAR = 12;
 		
 		//const STATE_EXPRESSION_AFTER_VAR = 7;
 		
@@ -108,7 +110,7 @@
 		
 		private $i;
 		
-		private $operators = Array('===', 'and', '--', '++', '==', '>=', '<=', 'or', '&&', '||', '<', '>', '&', '^', '~', '|', '+', '-');
+		private $operators = Array('===', 'and', '!==', '--', '++', '==', '!=', '>=', '<=', 'or', '&&', '||', '<', '>', '&', '^', '~', '|', '+', '-');
 		
 		private $_error_line;
 		
@@ -305,7 +307,15 @@
 			
 			if($this->_var !== null)
 			{
-				$var[] = Array('var' => $this->_var);
+				if($this->_var_type !== null)
+				{
+					$var[] = Array('var' => $this->_var, 'type' => $this->_var_type);
+					$this->_var_type = null;
+				}
+				else
+				{
+					$var[] = Array('var' => $this->_var);
+				}
 				$this->_var = null;
 			}
 			elseif($this->_number !== null)
@@ -446,6 +456,19 @@
 			return true;
 		}
 		
+		private function checkAppendVar()
+		{
+			if(isset($this->attributes['_var']['var']))
+			{
+				$this->attributes['_var'][] = Array('type' => $this->_var_type, 'var' => $this->_var);
+			}
+			else
+			{
+				$this->attributes['_var']['var'] = $this->_var;
+			}
+			$this->_var = null;
+		}
+		
 		public function _parse($str)
 		{
 			$this->str = $str;
@@ -530,32 +553,13 @@
 							{
 								$this->i++;
 								$this->_var_type = 'object';
-								
-								if(isset($this->attributes['_var']['var']))
-								{
-									$this->attributes['_var'][] = Array('type' => $this->_var_type, 'var' => $this->_var);
-								}
-								else
-								{
-									$this->attributes['_var']['var'] = $this->_var;
-								}
-								
-								$this->_var = null;
-								
+								$this->checkAppendVar();
 								continue;
 							}
 							elseif($c === '.')
 							{
 								$this->_var_type = 'array';
-								if(isset($this->attributes['_var']['var']))
-								{
-									$this->attributes['_var'][] = Array('type' => $this->_var_type, 'var' => $this->_var);
-								}
-								else
-								{
-									$this->attributes['_var']['var'] = $this->_var;
-								}
-								$this->_var = null;
+								$this->checkAppendVar();
 								continue;
 							}
 							elseif(ctype_alnum($c) || $c === '_')
@@ -822,6 +826,7 @@
 						
 						if($c === '"')
 						{
+							$this->_string = '';
 							$this->state = self::STATE_EXPRESSION_STRING;
 							continue;
 						}
@@ -863,6 +868,39 @@
 								$this->switchState(self::STATE_EXPRESSION);
 								continue;
 							}
+							// probably end of var - an operator might follow
+							elseif($this->find('->'))
+							{
+								
+								$this->i++;
+								$this->checkAppendOperand();
+								$this->_var_type = 'object';
+								continue;
+							}
+							elseif($c === '.')
+							{
+								$this->checkAppendOperand();
+								$this->_var_type = 'array';
+								continue;
+							}
+							elseif($op = $this->is_operator())
+							{
+								//var_dump($this->_var, $op);
+								$this->_op = $op;
+								$this->checkAppendOperand();
+								$this->checkAppendOperator();
+								$this->state = self::STATE_EXPRESSION;
+								continue;
+							}
+							// needed for {set $foo=$bar}
+							elseif($c === '=')
+							{
+								$this->_op = '=';
+								$this->checkAppendOperand();
+								$this->checkAppendOperator();
+								$this->state = self::STATE_EXPRESSION;
+								continue;
+							}
 						}
 						
 						if($this->_var === null)
@@ -881,8 +919,6 @@
 								continue;
 							}
 						}
-						
-						
 						
 						$this->error();
 					break;
@@ -933,6 +969,23 @@
 						}
 						
 						$this->_string .= $c;
+					break;
+					case self::STATE_EXPRESSION_AFTER_VAR : 
+						if($this->find('->'))
+						{
+							$this->i++;
+							$this->_var_type = 'object';
+							//$this->checkAppendVar();
+							$this->state = self::STATE_EXPRESSION_VAR;
+							continue;
+						}
+						else if($c === '.')
+						{
+							$this->_var_type = 'array';
+							//$this->checkAppendVar();
+							$this->state = self::STATE_EXPRESSION_VAR;
+							continue;
+						}
 					break;
 					/*
 					case self::STATE_EXPRESSION_AFTER_VAR :
