@@ -17,7 +17,7 @@
 			}
 			else
 			{
-				$q .= implode(', ', $this->columns);
+				$q .= $this->escape_columns ? (' `'.implode('`, `', $this->columns).'`') : (' '.implode(', ', $this->columns));
 			}
 			
 			$q .= ' FROM '.$this->from;
@@ -38,10 +38,15 @@
 				$where = Array();
 				foreach($this->where AS $k => $v)
 				{
-					$where[] = '`'.$k."` = '".$v."'";
+					$where[] = (strpos($k, '.') === false ? '`'.$k.'`' : $k)." = '".$v."'";
 				}
 				$q .= implode(') && (', $where);
 				$q .= ')';
+			}
+			
+			if(count($this->group_by))
+			{
+				$q .= ' GROUP BY '.implode(', ', $this->group_by);
 			}
 			
 			return $q;

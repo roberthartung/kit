@@ -14,10 +14,13 @@
 		
 		private $query;
 		
-		public function __construct(array $columns, query $query = null)
+		private $wrappers;
+		
+		public function __construct(array $columns, query $query = null, array $wrappers = Array())
 		{
 			$this->columns = $columns;
 			$this->query = $query;
+			$this->wrappers = $wrappers;
 			
 			foreach($this->columns AS $column_name => $column_info)
 			{
@@ -26,6 +29,11 @@
 					$this->column_pk = $column_name;
 					break;
 				}
+			}
+			
+			foreach($this->wrappers AS $wrapper)
+			{
+				call_user_func($wrapper, $this);
 			}
 		}
 		

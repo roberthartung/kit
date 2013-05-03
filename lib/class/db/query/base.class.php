@@ -5,13 +5,45 @@
 	{
 		protected $where = Array();
 		
+		protected $group_by = Array();
+		
 		protected $joins = Array();
 		
 		protected $columns = Array();
 		
+		protected $escape_columns = true;
+		
+		public function getColumns()
+		{
+			$keys = array_keys($this->columns);
+			if(is_string($keys[0]))
+			{
+				return $keys;
+			}
+			else
+			{
+				return array_values($this->columns);
+			}
+		}
+		
+		public function disableColumnEscaping()
+		{
+			$this->escape_columns = false;
+		}
+		
 		public function where(array $where)
 		{
 			$this->where = array_merge($this->where, $where);
+		}
+		
+		public function group_by($group_by)
+		{
+			if(!is_array($group_by))
+			{
+				$group_by = Array($group_by);
+			}
+			
+			$this->group_by = array_merge($this->group_by, $group_by);
 		}
 		
 		public function getWhere()
@@ -26,6 +58,11 @@
 				$using = Array($using);
 			}
 			$this->joins[] = $type.' '.$tbl_name.($tbl_alias != null ? ' AS '.$tbl_alias : '').' USING (`'.implode('`,`', $using).'`)';
+		}
+		
+		public function join_on($tbl_name, $on, $tbl_alias = null, $type = 'JOIN')
+		{
+			$this->joins[] = $type.' '.$tbl_name.($tbl_alias != null ? ' AS '.$tbl_alias : '').' ON '.$on;
 		}
 		
 		public function addColumn($k, $v)
@@ -49,7 +86,7 @@
 			$q = '';
 			foreach($a AS $k => $v)
 			{
-				$q .= '`'.$k.'` = '.(strpos($v,':') === 0 ? $v : '`'.$v.'`').'';
+				$q .= '`'.$k.'` = '.(strpos($v,':') === 0 ? $v : "'".$v."'").'';
 				
 				if($i++ < $count)
 				{

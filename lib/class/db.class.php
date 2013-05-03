@@ -32,7 +32,7 @@
 		{
 			$result = call_user_func_array(Array($this->conn, $method), $args);
 			
-			if(!$result)
+			if($result === false)
 			{
 				$error = $this->conn->errorInfo();
 				throw new queryException($error[2], $error[1], $args[0]);
@@ -82,7 +82,7 @@
 		 */
 		
 		public function insert($table, array $data)
-		{
+		{			
 			$columns = array_keys($data);
 			$values = Array();
 			foreach(array_values($data) AS $val)

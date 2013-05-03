@@ -4,7 +4,7 @@
 	use PDOStatement;
 	use PDO;
 	use Iterator;
-	use Exception;
+	use kit\db\result\offsetException;
 	
 	class result implements Iterator
 	{
@@ -20,19 +20,24 @@
 		
 		private $query;
 		
+		private $num_rows = null;
+		
+		private $wrappers = Array();
+		
+		private $columns = Array();
+		
 		public function __construct(PDOStatement $result, query $query = null)
 		{
 			$this->result = $result;
 			$this->query = $query;
-			$columns = Array();
-			for($c=0;$c<$result->columnCount();$c++)
+			for($c=0;$c<$this->result->columnCount();$c++)
 			{
-				$meta = $result->getColumnMeta($c);
-				$columns[$meta['name']] = $meta;
+				$meta = $this->result->getColumnMeta($c);
+				$this->columns[$meta['name']] = $meta;
 			}
 			
 			// var_dump($this->result);
-			$this->data = $this->result->fetchAll(PDO::FETCH_CLASS, 'kit\\db\\result\\row', Array($columns, $this->query));
+			
 			
 			/*
 			for($c=0;$c<$result->columnCount();$c++)
@@ -45,6 +50,34 @@
 				}
 			}
 			*/
+			
+			// we moved this out of here to be able to use the result class (instead of any other class) for wrappers
+			// this way you can call execute() on a model or even make a plain $db->query("SELECT ...") and add wrapper
+			// to it
+			// $this->fetchData();
+		}
+		
+		private function fetchData()
+		{
+			if($this->num_rows === null)
+			{
+				$this->data = $this->result->fetchAll(PDO::FETCH_CLASS, 'kit\\db\\result\\row', Array($this->columns, $this->query, $this->wrappers));
+				$this->num_rows = count($this->data);
+			}
+		}
+		
+		public function addWrapper($wrapper)
+		{
+			$this->wrappers[] = $wrapper;
+			
+			return $this;
+		}
+		
+		public function num_rows()
+		{
+			$this->fetchData();
+			
+			return $this->num_rows;
 		}
 		
 		public function rewind()
@@ -54,20 +87,25 @@
 
     public function current()
 		{
-        return $this->data[$this->index];
+			$this->fetchData();
+			
+      return $this->data[$this->index];
     }
 
-    public function key() {
-        return $this->index;
+    public function key()
+		{
+  		return $this->index;
     }
 
-    public function next() {
-        ++$this->index;
+    public function next()
+		{
+    	$this->index++;
     }
 
     public function valid()
 		{
-        return isset($this->data[$this->index]);
+			$this->fetchData();
+  		return isset($this->data[$this->index]);
     }
 		
 		/*
@@ -79,9 +117,11 @@
 		
 		public function getRow($offset = 0)
 		{
+			$this->fetchData();
+			
 			if(!isset($this->data[$offset]))
 			{
-				throw new Exception;
+				throw new offsetException();
 			}
 			
 			return $this->data[$offset];
