@@ -883,14 +883,22 @@
 								$this->_var_type = 'array';
 								continue;
 							}
-							elseif($op = $this->is_operator())
+							// exclude 'or' & 'and' operator
+							elseif(($op = $this->is_operator()))
 							{
+								if(ctype_alpha($op))
+								{
+									$this->i--;
+								}
+								else
+								{
 								//var_dump($this->_var, $op);
-								$this->_op = $op;
-								$this->checkAppendOperand();
-								$this->checkAppendOperator();
-								$this->state = self::STATE_EXPRESSION;
-								continue;
+									$this->_op = $op;
+									$this->checkAppendOperand();
+									$this->checkAppendOperator();
+									$this->state = self::STATE_EXPRESSION;
+									continue;
+								}
 							}
 							// needed for {set $foo=$bar}
 							elseif($c === '=')
@@ -912,7 +920,7 @@
 							}
 						}
 						else
-						{
+						{						
 							if(ctype_alnum($c) || $c === '_')
 							{
 								$this->_var .= $c;
@@ -946,7 +954,8 @@
 							continue;
 						}
 						
-						if(ctype_digit($c))
+						// . needed for floating point
+						if(ctype_digit($c) || $c === '.')
 						{
 							$this->_number .= $c;
 							continue;
