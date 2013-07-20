@@ -78,6 +78,12 @@
 		
 		const STATE_COMMAND_VAR = 12;
 		
+		const STATE_LANGUAGE = 13;
+		
+		const STATE_LANGUAGE_IDENTIFIER = 14;
+		
+		const STATE_LANGUAGE_AFTER_IDENTIFIER = 15;
+		
 		//const STATE_EXPRESSION_AFTER_VAR = 7;
 		
 		//const STATE_EXPRESSION_AFTER_OPERATOR = 8;
@@ -231,6 +237,8 @@
 		private $_bracket_stack_top;
 		
 		private $_bracket_stack;
+		
+		private $_lang_identifier;
 		
 		private $debug = false;
 		
@@ -495,6 +503,7 @@
 			$this->_string = null;
 			$this->_bracket_stack = null;
 			$this->_bracket_stack_top = null;
+			$this->_lang_identifier = null;
 			
 			// Go to through all characters
 			for($this->i = 0; $this->i < $this->len; $this->i++)
@@ -524,6 +533,13 @@
 							continue;
 						}
 						
+						if($c === '%')
+						{
+							$this->state = self::STATE_LANGUAGE;
+							$this->_cmd = 'lang';
+							continue;
+						}
+						
 						if($c === '$')
 						{
 							$this->state = self::STATE_COMMAND_VAR;
@@ -533,6 +549,47 @@
 						
 						$this->error();
 					break;
+					case self::STATE_LANGUAGE :
+						if(ctype_space($c))
+						{
+							$this->error();
+							continue;
+						}
+						
+						if($c === '.')
+						{
+							$this->attributes['_identifiers'][] = $this->_lang_identifier;
+							$this->_lang_identifier = null;
+							continue;
+						}
+						
+						$this->_lang_identifier .= $c;
+						
+						/*
+						if($c === '"')
+						{
+							$this->state = self::STATE_LANGUAGE_IDENTIFIER;	
+						}
+						*/
+					break;
+					/*
+					case self::STATE_LANGUAGE_IDENTIFIER :
+						if(ctype_space($c))
+						{
+							continue;
+						}
+						
+						if($c === '"')
+						{
+							$this->attributes['_identifier'] = $this->_lang_identifier;
+							$this->_lang_identifier = null;
+							$this->state = self::STATE_LANGUAGE_AFTER_IDENTIFIER;
+							continue;
+						}
+						
+						$this->_lang_identifier .= $c;
+					break;
+					*/
 					case self::STATE_COMMAND_VAR :
 						if(ctype_space($c))
 						{
@@ -1086,10 +1143,16 @@
 				case self::STATE_VALUE :
 					$this->checkAppendAttribute();
 				break;
+				case self::STATE_LANGUAGE :
+					if($this->_lang_identifier !== null)
+					{
+						$this->attributes['_identifiers'][] = $this->_lang_identifier;
+						$this->_lang_identifier = null;
+					}
+				break;
 				case self::STATE_COMMAND :
 					
 				break;
-				
 				case self::STATE_EXPRESSION_VAR :
 					$this->checkAppendOperand();
 				break;

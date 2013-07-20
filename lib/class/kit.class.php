@@ -10,6 +10,7 @@
 	namespace kit;
 	
 	use Exception;
+	use SimpleXMLElement;
 	
 	class kit
 	{
@@ -52,6 +53,8 @@
 		private $db;
 		
 		private $cfg;
+		
+		private $path;
 		
 		private $parameters = Array();
 		
@@ -210,6 +213,7 @@
 				$this->parameters = $parameters;
 				$this->depth = $depth;
 				$this->controller = $controller;
+				$this->path = PATH_WWW.substr($url,1);
 			}
 		}
 		
@@ -247,8 +251,9 @@
 			
 			if($this->view !== null)
 			{
-				
 				$this->view->BASE = PATH_WWW;
+				$this->view->PATH = $this->path;
+				$this->view->LANG = lang::getLanguage();
 				$this->view->run();
 				//throw new Exception('no view set');
 			}
@@ -301,6 +306,13 @@
 	  		
 	  		require_once($path.$class.$file_ext);
 	  	});
+	  }
+	  
+	  public function addLanguageFile($file)
+	  {
+	  	$lang = lang::getInstance();
+	  	$lang->addFile($file);
+	  	return $lang;
 	  }
 	}
 ?>

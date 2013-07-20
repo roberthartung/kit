@@ -80,6 +80,8 @@
 				$$___k = $___v;
 			}
 			
+			$lang = lang::getInstance();
+			
 			include($this->path_cached);
 			
 			return ob_get_clean();

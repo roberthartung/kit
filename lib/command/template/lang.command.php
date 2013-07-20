@@ -1,6 +1,8 @@
 <?php
 	namespace kit\template;
 	
+	use Exception;
+	
 	class langCommand
 	{
 		private $attr;
@@ -14,12 +16,20 @@
 		{
 			$code = '<?php ';
 			
-			if(!isset($this->attr['_identifier']))
+			if(isset($this->attr['_identifier']))
+			{
+				$code .= ' echo $lang->get(\''.$this->attr['_identifier'].'\'); ';
+			}
+			if(isset($this->attr['_identifiers']))
+			{
+				$code .= ' echo $lang->get(\''.implode("','", $this->attr['_identifiers']).'\'); ';
+			}
+			else
 			{
 				throw new Exception('Identifier exprected');
 			}
 			
-			$code .= ' $lang->get(\''.$this->attr['_identifier'].'\'); ';
+			
 			
 			return $code.' ?>';
 		}

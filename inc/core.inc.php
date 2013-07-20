@@ -46,7 +46,6 @@
 		
 		// replace the namespace separator with directory separator and remove namespace from the beginning
 		
-		
 		if(($pos = strpos($class, 'Controller')) !== false)
 		{
 			$class = substr($class,0,$pos);
