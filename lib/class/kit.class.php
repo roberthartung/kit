@@ -247,7 +247,7 @@
 				throw new Exception('controller does not implement controllerInterface');
 			}
 			
-			$this->controller->run();
+			$json = $this->controller->run();
 			
 			if($this->view !== null)
 			{
@@ -256,6 +256,11 @@
 				$this->view->LANG = lang::getLanguage();
 				$this->view->run();
 				//throw new Exception('no view set');
+			}
+			elseif(isset($json))
+			{
+				header('Content-Type: application/json; charset=UTF8');
+				echo json_encode($json);
 			}
 		}
 		
@@ -270,6 +275,19 @@
 		public function setView(viewInterface $view)
 		{
 			$this->view = $view;
+		}
+		
+		/**
+		 * Sets the current view
+		 * 
+		 * @param viewInterface View
+		 * 
+		 * @return viewInterface view
+		 */
+		
+		public function getView()
+		{
+			return $this->view;
 		}
 		
 		/**
