@@ -7,11 +7,15 @@
 		
 		protected $group_by = Array();
 		
+		protected $order_by = Array();
+		
 		protected $joins = Array();
 		
 		protected $columns = Array();
 		
 		protected $escape_columns = true;
+		
+		protected $limit;
 		
 		public function getColumns()
 		{
@@ -36,6 +40,16 @@
 			$this->where = array_merge($this->where, $where);
 		}
 		
+		public function order_by($column, $type = 'ASC')
+		{
+			$this->order_by[$column] = $type;
+		}
+		
+		public function limit($offset, $length = null)
+		{
+			$this->limit = $length == null ? $offset : "$offset, $length";
+		}
+		
 		public function group_by($group_by)
 		{
 			if(!is_array($group_by))
@@ -49,6 +63,11 @@
 		public function getWhere()
 		{
 			return $this->where;
+		}
+		
+		public function getOrderBy()
+		{
+			return $this->order_by;
 		}
 		
 		public function join_using($tbl_name, $using, $tbl_alias = null, $type = 'JOIN')

@@ -38,7 +38,14 @@
 				$where = Array();
 				foreach($this->where AS $k => $v)
 				{
-					$where[] = (strpos($k, '.') === false ? '`'.$k.'`' : $k)." = '".$v."'";
+					if($k[0] === '%')
+					{
+						$where[] = substr($k,1)." LIKE '".$v."%'";
+					}
+					else
+					{
+						$where[] = (strpos($k, '.') === false ? '`'.$k.'`' : $k)." = '".$v."'";
+					}
 				}
 				$q .= implode(') && (', $where);
 				$q .= ')';
@@ -47,6 +54,23 @@
 			if(count($this->group_by))
 			{
 				$q .= ' GROUP BY '.implode(', ', $this->group_by);
+			}
+			
+			if(count($this->order_by))
+			{
+				$order = Array();
+				
+				foreach($this->getOrderBy() AS $col => $type)
+				{
+					$order[] = $col." ".$type;
+				}
+				
+				$q .= ' ORDER BY '.implode(' , ', $order);
+			}
+			
+			if($this->limit != null)
+			{
+				$q .= ' LIMIT '.$this->limit;
 			}
 			
 			return $q;

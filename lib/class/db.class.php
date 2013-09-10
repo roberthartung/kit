@@ -11,6 +11,8 @@
 		
 		private $conn;
 		
+		private $charset = 'utf8';
+		
 		public function __construct()
 		{
 			// PDO::getAvailableDrivers()
@@ -21,7 +23,7 @@
 			switch($this->cfg->db->type)
 			{
 				case 'mysql' :
-					$dsn = 'mysql:dbname='.$this->cfg->db->database.';host='.$this->cfg->db->hostname;
+					$dsn = 'mysql:dbname='.$this->cfg->db->database.';host='.$this->cfg->db->hostname.';charset='.$this->charset;
 				break;
 			}
 			

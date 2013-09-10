@@ -58,6 +58,8 @@
 		
 		private $parameters = Array();
 		
+		private $controller_url;
+		
 		public function setup()
 		{
 			$root_doc = $_SERVER['DOCUMENT_ROOT'];
@@ -84,11 +86,7 @@
 				throw new parserException('parser:redirect_url');
 			}
 			
-			$url = parse_url(substr($this->url, strlen(KIT_HTTP_PATH))); 
-			
-			$this->url = $url['path'];
-			
-			$this->parts = $this->getParts($this->url);
+			$this->setRequestURL(substr($this->url, strlen(KIT_HTTP_PATH)));
 			
 			$this->cfg = cfg::getInstance();
 			
@@ -100,7 +98,7 @@
 			return $this;
 		}
 		
-		private function getParts($url)
+		public function getParts($url)
 		{
 			if(strpos($url, '/') === 0)
 			{
@@ -148,6 +146,18 @@
 			return $parts;
 		}
 		
+		public function getControllerURL()
+		{
+			return $this->controller_url;
+		}
+		
+		public function setRequestURL($url)
+		{
+			$url = parse_url($url);
+			$this->url = isset($url['path']) ? $url['path'] : '';
+			$this->parts = $this->getParts($this->url);
+		}
+		
 		public function registerUrl($url, $controller)
 		{
 			$parts = $this->getParts($url);
@@ -169,6 +179,7 @@
 			
 			$parameters = Array();
 			$depth = 0;
+			$url_parts = Array();
 			
 			//var_dump(count($parts), count($this->parts));
 			
@@ -200,6 +211,8 @@
 					break;
 				}
 				
+				$url_parts[] = $_part;
+				
 				$depth++;
 			}
 			
@@ -214,6 +227,7 @@
 				$this->depth = $depth;
 				$this->controller = $controller;
 				$this->path = PATH_WWW.substr($url,1);
+				$this->controller_url = implode('/', $url_parts);
 			}
 		}
 		
@@ -226,7 +240,7 @@
 			
 			//var_dump($this->controller);
 			
-			$_GET = array_merge($_GET, $this->parameters);
+			$_GET += $this->parameters;
 			$class = 'kit\\'.$this->controller.'Controller';
 			
 			$this->controller = call_user_func(Array($class, 'getInstance'));
@@ -254,12 +268,13 @@
 				$this->view->BASE = PATH_WWW;
 				$this->view->PATH = $this->path;
 				$this->view->LANG = lang::getLanguage();
+				$this->view->URL = $this->getControllerURL();
 				$this->view->run();
 				//throw new Exception('no view set');
 			}
 			elseif(isset($json))
 			{
-				header('Content-Type: application/json; charset=UTF8');
+				header('Content-Type: application/json; charset=utf-8');
 				echo json_encode($json);
 			}
 		}

@@ -4,6 +4,7 @@
   use PDO;
   use kit\db\queryException;
   use kit\db\query\select;
+  use kit\db\query\delete;
   use kit\db\query\update;
   use PDOStatement;
   
@@ -217,6 +218,25 @@
 			$stmnt = $this->db->prepare($qry_update);
 			
 			$this->bindValues($stmnt, $data);
+			
+			if(!$stmnt->execute())
+			{
+				$error = $stmnt->errorInfo();
+				throw new queryException($error[2], $error[1], $stmnt);
+			}
+			
+			return true;
+		}
+		
+		public function delete(array $where)
+		{
+			$qry_delete = new delete($this->table_name);
+			if(count($where))
+				$qry_delete->where($where);
+			
+			$stmnt = $this->db->prepare($qry_delete);
+			
+			//$this->bindValues($stmnt, $data);
 			
 			if(!$stmnt->execute())
 			{
