@@ -42,6 +42,10 @@
 					{
 						$where[] = substr($k,1)." LIKE '".$v."%'";
 					}
+					elseif(is_array($v))
+					{
+						$where[] = "$k IN ('".implode("','", $v)."')";
+					}
 					else
 					{
 						$where[] = (strpos($k, '.') === false ? '`'.$k.'`' : $k)." = '".$v."'";
