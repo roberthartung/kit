@@ -89,7 +89,7 @@
 			$suffix = 'class';
 		}
 		
-		$url = $suffix.DIRECTORY_SEPARATOR.strtolower($class).'.'.$suffix.'.php';
+		$url = $suffix.DIRECTORY_SEPARATOR.$class.'.'.$suffix.'.php';
 		
 		// var_dump($url);
 		
