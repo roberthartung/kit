@@ -40,6 +40,10 @@
 				require_once($path);
 				return true;
 			}
+			else
+			{
+				throw new Exception('File not found: '.$path);
+			}
 			
 			return false;
 		}
