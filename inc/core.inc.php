@@ -26,6 +26,8 @@
 	
 	function __kit_autoload($class)
 	{
+		$class = strtolower($class);
+		
 		// This function will only load classes from kit namespace
 		if(strpos($class,'kit\\') !== 0)
 		{
