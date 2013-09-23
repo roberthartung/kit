@@ -32,7 +32,7 @@
 							$code .= '->'.$this->attr['_var'][$a]['var'];
 						break;
 						case 'array' :
-							if(ctype_digit())
+							if(ctype_digit($this->attr['_var'][$a]['var']))
 							{
 								$code .= '['.$this->attr['_var'][$a]['var'].']';
 							}
