@@ -26,14 +26,12 @@
 	
 	function __kit_autoload($class)
 	{
-		$class = strtolower($class);
-		
 		// This function will only load classes from kit namespace
 		if(strpos($class,'kit\\') !== 0)
 		{
 			$class = str_replace('\\', DIRECTORY_SEPARATOR, $class);
 			
-			$path = PATH_SITE_ROOT.'lib'.DIRECTORY_SEPARATOR.'class'.DIRECTORY_SEPARATOR.$class.'.class.php';
+			$path = PATH_SITE_ROOT.'lib'.DIRECTORY_SEPARATOR.'class'.DIRECTORY_SEPARATOR.strtolower($class).'.class.php';
 			
 			if(file_exists($path))
 			{
@@ -93,9 +91,7 @@
 			$suffix = 'class';
 		}
 		
-		$url = $suffix.DIRECTORY_SEPARATOR.$class.'.'.$suffix.'.php';
-		
-		// var_dump($url);
+		$url = $suffix.DIRECTORY_SEPARATOR.strtolower($class).'.'.$suffix.'.php';
 		
 		if(!file_exists(PATH_SITE_ROOT.'lib'.DIRECTORY_SEPARATOR.$url) && !file_exists(PATH_KIT_ROOT.'lib'.DIRECTORY_SEPARATOR.$url))
 		{
