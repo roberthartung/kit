@@ -18,9 +18,16 @@
 			
 			if(isset($this->attr['_identifier']))
 			{
-				$code .= ' echo $lang->get(\''.$this->attr['_identifier'].'\'); ';
+				if(strpos($this->attr['_identifier'], '$') === 0)
+				{
+					$code .= ' echo $lang->get('.$this->attr['_identifier'].'); ';
+				}
+				else
+				{
+					$code .= ' echo $lang->get(\''.$this->attr['_identifier'].'\'); ';
+				}
 			}
-			if(isset($this->attr['_identifiers']))
+			elseif(isset($this->attr['_identifiers']))
 			{
 				$code .= ' echo $lang->get(\''.implode("','", $this->attr['_identifiers']).'\'); ';
 			}
@@ -28,8 +35,6 @@
 			{
 				throw new Exception('Identifier exprected');
 			}
-			
-			
 			
 			return $code.' ?>';
 		}

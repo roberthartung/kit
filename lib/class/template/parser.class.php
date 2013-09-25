@@ -1146,7 +1146,14 @@
 				case self::STATE_LANGUAGE :
 					if($this->_lang_identifier !== null)
 					{
-						$this->attributes['_identifiers'][] = $this->_lang_identifier;
+						if(isset($this->attributes['_identifiers']))
+						{
+							$this->attributes['_identifiers'][] = $this->_lang_identifier;	
+						}
+						else
+						{
+							$this->attributes['_identifier'] = $this->_lang_identifier;	
+						}
 						$this->_lang_identifier = null;
 					}
 				break;
