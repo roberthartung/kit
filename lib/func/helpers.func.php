@@ -4,6 +4,6 @@
 	function urlify($str)
 	{
 		// , 
-		return preg_replace(Array('/\s/i', '/-{2,}/i', '/[^a-z0-9-]/i'), Array('-', '-', ''), $str);
+		return preg_replace(Array('/\s/i', '/-{2,}/i', '/[^a-z0-9\-öüäß]/i'), Array('-', '-', ''), $str);
 	}
 ?>
