@@ -33,7 +33,8 @@
 			
 			
 			$additional_vars = Array();
-			if(isset($this->attr['_expression']) && isset($this->data[0]))
+			//  && isset($this->data[0])
+			if(isset($this->attr['_expression']))
 			{
 				foreach($this->attr['_expression'] AS $exp)
 				{
