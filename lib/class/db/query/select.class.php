@@ -46,6 +46,10 @@
 					{
 						$where[] = "$k IN ('".implode("','", $v)."')";
 					}
+					elseif($v === null)
+					{
+						$where[] = (strpos($k, '.') === false ? '`'.$k.'`' : $k)." IS NULL";
+					}
 					else
 					{
 						$where[] = (strpos($k, '.') === false ? '`'.$k.'`' : $k)." = '".$v."'";
