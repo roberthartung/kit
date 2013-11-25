@@ -696,8 +696,6 @@
 							//$this->_bracket_stack->add($this->_op);
 						}
 						
-						
-						
 						if($this->_attr_name === null)
 						{
 							if(ctype_alpha($c) || $c === '_')
@@ -770,6 +768,7 @@
 								$this->_string .= $c;
 								$this->_escaped = false;
 							}
+							
 							continue;
 						}
 						
@@ -778,6 +777,7 @@
 							if(!$this->_escaped)
 							{
 								$this->_attr_value = $this->_string;
+								$this->checkAppendAttribute();
 								$this->_string = null;
 								$this->state = self::STATE_BEGIN;
 							}

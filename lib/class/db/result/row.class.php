@@ -33,6 +33,7 @@
 			
 			foreach($this->wrappers AS $wrapper)
 			{
+				
 				call_user_func($wrapper, $this);
 			}
 		}

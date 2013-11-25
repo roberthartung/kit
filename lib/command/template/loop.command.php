@@ -24,7 +24,6 @@
 			}
 			else
 			{
-				
 				if(array_key_exists('from', $this->attr))
 				{
 					//$code .= ' var_dump($this->data[\''.$this->attr['from'].'\']); ';
@@ -34,10 +33,6 @@
 					$code .= ' foreach($'.$this->attr['from'].' AS $__key => $'.$as.') {';
 				}
 			}
-			
-			
-			
-			
 			
 			return $code.' ?>';
 		}
