@@ -9,5 +9,15 @@
 		{
 			$this->template->$k = $v;
 		}
+		
+		public function get()
+		{
+			return $this->template->get();
+		}
+		
+		public function run()
+		{
+			echo $this->get();
+		}
 	}
 ?>

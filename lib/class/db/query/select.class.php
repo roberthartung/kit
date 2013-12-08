@@ -38,13 +38,20 @@
 				$where = Array();
 				foreach($this->where AS $k => $v)
 				{
+					$not = false;
+					if(strpos($k, '!') === 0)
+					{
+						$not = true;
+						$k = substr($k,1);
+					}
+					
 					if($k[0] === '%')
 					{
 						$where[] = substr($k,1)." LIKE '".$v."%'";
 					}
 					elseif(is_array($v))
 					{
-						$where[] = "$k IN ('".implode("','", $v)."')";
+						$where[] = "$k ".($not ? "NOT" : "")." IN ('".implode("','", $v)."')";
 					}
 					elseif($v === null)
 					{
