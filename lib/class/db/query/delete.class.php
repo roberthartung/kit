@@ -22,7 +22,13 @@
 				$where = Array();
 				foreach($this->where AS $k => $v)
 				{
-					$where[] = '`'.$k."` = '".$v."'";
+					if(is_array($v)) {
+						$where[] = '`'.$k."` IN ('".implode("','", $v)."')";
+					} else {
+						$where[] = '`'.$k."` = '".$v."'";
+					}
+					
+					
 				}
 				$q .= implode(') && (', $where);
 				$q .= ')';
