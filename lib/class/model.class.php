@@ -212,8 +212,6 @@
 			$query = "INSERT INTO ".$this->table_name." (`".implode('`,`', $columns)."`) VALUES (:".implode(', :', $columns).") ON DUPLICATE KEY UPDATE ".implode(', ', $update);
 			$stmnt = $this->db->prepare($query);
 			
-			var_dump($query, $stmnt);
-			
 			$this->bindValues($stmnt, $keys);
 			$this->bindValues($stmnt, $data);
 			
