@@ -159,7 +159,7 @@
 		}
 		
 		public function registerUrl($url, $controller)
-		{
+		{			
 			$parts = $this->getParts($url);
 			
 			$controller = str_replace('/', '\\', $controller);

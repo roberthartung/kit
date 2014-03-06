@@ -56,6 +56,7 @@
 		 * @deprecated
 		 */
 
+/*
 		public function execute()
 		{
 			if($this->executed)
@@ -74,6 +75,7 @@
 			//$this->data = $this->result->fetchAll(PDO::FETCH_ASSOC);
 			return $this->result;
 		}
+		*/
 		
 		/*
 		public function next()
@@ -192,6 +194,39 @@
 		}
 		
 		/**
+		 * INSERT or Update
+		 */
+	 
+	  public function insertOrUpdate(array $keys, array $data) {
+	  	// Make sure only columns from model are used
+	  	$data = array_intersect_key($data, $this->columns);
+	  	$keys = array_intersect_key($keys, $this->columns);
+	  	// Get column names
+			$columns = array_merge(array_keys($keys), array_keys($data));
+			
+			$update = Array();
+			foreach(array_keys($data) AS $column) {
+				$update[] = "`".$column."` = :".$column; 
+			}
+			
+			$query = "INSERT INTO ".$this->table_name." (`".implode('`,`', $columns)."`) VALUES (:".implode(', :', $columns).") ON DUPLICATE KEY UPDATE ".implode(', ', $update);
+			$stmnt = $this->db->prepare($query);
+			
+			var_dump($query, $stmnt);
+			
+			$this->bindValues($stmnt, $keys);
+			$this->bindValues($stmnt, $data);
+			
+			if(!$stmnt->execute())
+			{
+				$error = $stmnt->errorInfo();
+				throw new queryException($error[2], $error[1], $stmnt);
+			}
+			
+			return $this->db->lastInsertId();
+	  }
+		
+		/**
 		 * Updates a row in this model
 		 */
 		
@@ -227,6 +262,10 @@
 			
 			return true;
 		}
+		
+		/**
+		 * Delete Rows
+		 */
 		
 		public function delete(array $where)
 		{

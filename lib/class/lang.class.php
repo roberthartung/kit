@@ -9,7 +9,11 @@
 		
 		private static $languages = Array();
 		
-		private static $language = 'de';
+		private static $language = null;
+		
+		private static $best_language = null;
+		
+		private static $best_language_q = 0;
 		
 		public function __get($key)
 		{
@@ -75,6 +79,8 @@
 	  	}
 	  	
 	  	$this->parseXML($this, $xml);
+	  	// Try to update prefered user language
+	  	$this->getUserLanguage();
 	  	
 	  	return $this;					
 		}
@@ -82,7 +88,7 @@
 		public function get()
 		{
 			$args = func_get_args();
-			$lang = self::$language;
+			$lang = self::getLanguage();
 			$path = $this->$lang;
 			$identifier = array_shift($args);
 			while(isset($path->$identifier))
@@ -109,7 +115,31 @@
 		
 		public static function getLanguage()
 		{
-			return self::$language;
+			return self::$language == null ? self::$best_language : self::$language;
+		}
+		
+		public function getUserLanguage() {
+			$accepted_languages = preg_split('/,\s*/', $_SERVER['HTTP_ACCEPT_LANGUAGE']);
+			
+			foreach ($accepted_languages as $accepted_language) {
+				$res = preg_match ('/^([a-z]{1,8}(?:-[a-z]{1,8})*)'.'(?:;\s*q=(0(?:\.[0-9]{1,3})?|1(?:\.0{1,3})?))?$/i', $accepted_language, $matches);
+				if(!$res)
+					continue;
+				
+				$lang_code = $matches[1];
+				if (isset($matches[2])) {
+					$lang_quality = (float)$matches[2];
+				} else {
+					$lang_quality = 1.0;
+				}
+				
+				///var_dump($lang_code, $lang_quality);
+				
+				if($lang_quality > self::$best_language_q && in_array($lang_code, self::$languages)) {
+					self::$best_language_q = $lang_quality;
+					self::$best_language = $lang_code;
+				}
+			}
 		}
 	}
 ?>

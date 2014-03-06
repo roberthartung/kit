@@ -3,6 +3,6 @@
 	
 	interface modelInterface
 	{
-		public function execute();
+		// public function execute();
 	}
 ?>
