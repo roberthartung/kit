@@ -7,16 +7,14 @@
 		
 		protected $from_alias;
 		
-		public function __toString()
-		{
+		private function get($asCount = false) {
 			$q = 'SELECT';
 			
-			if(!count($this->columns))
-			{
+			if($asCount) {
+				$q .= ' COUNT(*) AS count ';
+			} else if(!count($this->columns)) {
 				$q .= ' *';
-			}
-			else
-			{
+			} else {
 				$q .= $this->escape_columns ? (' `'.implode('`, `', $this->columns).'`') : (' '.implode(', ', $this->columns));
 			}
 			
@@ -91,10 +89,19 @@
 			return $q;
 		}
 		
+		public function __toString()
+		{
+			return $this->get();
+		}
+		
 		public function from($tbl, $alias = null)
 		{
 			$this->from = $tbl;
 			$this->from_alias = $alias;
+		}
+		
+		public function countAll() {
+			return $this->get(true);
 		}
 	}
 ?>

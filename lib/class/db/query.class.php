@@ -35,8 +35,8 @@
 		
 		public function __call($func, $args)
 		{
-			$return = call_user_func_array(Array($this->wrapper, $func), $args);;
-			if(strpos($func, 'get') === 0)
+			$return = call_user_func_array(Array($this->wrapper, $func), $args);
+			if(strpos($func, 'get') === 0 || $func === 'asCount')
 			{
 				return $return;
 			}
@@ -47,6 +47,10 @@
 		public function execute()
 		{
 			return $this->db->query($this);
+		}
+		
+		public function countAll() {
+			return $this->db->query($this->wrapper->countAll())->getRow()->count;
 		}
 		
 		public function __toString()

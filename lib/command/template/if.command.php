@@ -3,14 +3,14 @@
 	
 	class ifCommand
 	{
-		private $attr;
+		protected $attr;
 		
 		public function __construct(array $attr, $file_name, $file_path)
 		{
 			$this->attr = $attr;
 		}
 		
-		private function expressionToString(array $expr)
+		protected function expressionToString(array $expr)
 		{
 			$expr_str = '';
 			
