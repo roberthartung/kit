@@ -23,6 +23,10 @@
 		
 		public function __set($key, $value)
 		{
+			if(empty($key)) {
+				var_dump(self::getLanguage());
+				throw new \Exception;
+			}
 			$this->$key = $value;
 		}
 		
@@ -123,21 +127,23 @@
 			
 			foreach ($accepted_languages as $accepted_language) {
 				$res = preg_match ('/^([a-z]{1,8}(?:-[a-z]{1,8})*)'.'(?:;\s*q=(0(?:\.[0-9]{1,3})?|1(?:\.0{1,3})?))?$/i', $accepted_language, $matches);
-				if(!$res)
+				if(!$res) {
 					continue;
+				}
 				
-				$lang_code = $matches[1];
+				$lang_codes = explode ('-', $matches[1]);
+				
 				if (isset($matches[2])) {
 					$lang_quality = (float)$matches[2];
 				} else {
 					$lang_quality = 1.0;
 				}
 				
-				///var_dump($lang_code, $lang_quality);
-				
-				if($lang_quality > self::$best_language_q && in_array($lang_code, self::$languages)) {
-					self::$best_language_q = $lang_quality;
-					self::$best_language = $lang_code;
+				foreach($lang_codes AS $lang_code) {
+					if($lang_quality > self::$best_language_q && in_array($lang_code, self::$languages)) {
+						self::$best_language_q = $lang_quality;
+						self::$best_language = $lang_code;
+					}
 				}
 			}
 		}
