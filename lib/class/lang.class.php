@@ -123,6 +123,10 @@
 		}
 		
 		public function getUserLanguage() {
+			if(!isset($_SERVER['HTTP_ACCEPT_LANGUAGE'])) {
+				return;
+			}
+			
 			$accepted_languages = preg_split('/,\s*/', $_SERVER['HTTP_ACCEPT_LANGUAGE']);
 			
 			foreach ($accepted_languages as $accepted_language) {

@@ -1,5 +1,5 @@
 <?php
-	header('Content-Type: text/html; charset=UTF8');
+	header('Content-Type: text/html; charset=UTF-8');
 	$kit->initController();
 	$kit->run();
 ?>
