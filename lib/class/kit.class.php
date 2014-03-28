@@ -62,16 +62,12 @@
 		
 		public function setup()
 		{
-			$root_doc = $_SERVER['DOCUMENT_ROOT'];
-			$root_doc = substr(PATH_SITE_ROOT, strlen($root_doc));
-			$root_doc = str_replace(DIRECTORY_SEPARATOR, '/', $root_doc);
-			//$root_doc = dirname($root_doc);
-			if($root_doc === '')
-			{
-				$root_doc = '/';
-			}
+			$this->cfg = cfg::getInstance();
 			
-			define('KIT_HTTP_PATH', $root_doc);
+			if(!empty($this->cfg->db->hostname) && !empty($this->cfg->db->username) && !empty($this->cfg->db->database))
+			{
+				$this->db = new db();
+			}
 			
 			if(isset($_SERVER['REQUEST_URI']))
 			{
@@ -86,14 +82,18 @@
 				throw new parserException('parser:redirect_url');
 			}
 			
-			$this->setRequestURL(substr($this->url, strlen(KIT_HTTP_PATH)));
-			
-			$this->cfg = cfg::getInstance();
-			
-			if(!empty($this->cfg->db->hostname) && !empty($this->cfg->db->username) && !empty($this->cfg->db->database))
+			$root_doc = $_SERVER['DOCUMENT_ROOT'];
+			$root_doc = substr(PATH_SITE_ROOT, strlen($root_doc));
+			$root_doc = str_replace(DIRECTORY_SEPARATOR, '/', $root_doc);
+			//$root_doc = dirname($root_doc);
+			if($root_doc === '')
 			{
-				$this->db = new db();
+				$root_doc = '/';
 			}
+			
+			define('KIT_HTTP_PATH', $root_doc);
+			
+			$this->setRequestURL(substr($this->url, strlen(KIT_HTTP_PATH)));
 			
 			return $this;
 		}

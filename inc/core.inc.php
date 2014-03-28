@@ -119,5 +119,7 @@
 		require_once(PATH_SITE_ROOT.'cfg/kit.cfg.php');
 	}
 	
-	$kit = kit\kit::getInstance()->setup();
+	if(!defined('KIT_NO_SETUP')) {
+		$kit = kit\kit::getInstance()->setup();
+	}
 ?>
