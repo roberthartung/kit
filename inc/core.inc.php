@@ -4,7 +4,9 @@
 	
 	$files = get_included_files();
 	
-	define('PATH_SITE_ROOT', dirname($files[0]).DIRECTORY_SEPARATOR);
+	if(!defined('PATH_SITE_ROOT')) {
+		define('PATH_SITE_ROOT', dirname($files[0]).DIRECTORY_SEPARATOR);
+	}
 	define('PATH_KIT_ROOT', dirname(dirname($files[count($files)-1])).DIRECTORY_SEPARATOR);
 	
 	if(!defined('PATH_KIT_LIB_CLASSES'))
