@@ -84,6 +84,8 @@
 		
 		const STATE_LANGUAGE_AFTER_IDENTIFIER = 15;
 		
+		const STATE_VALUE_VAR = 16;
+		
 		//const STATE_EXPRESSION_AFTER_VAR = 7;
 		
 		//const STATE_EXPRESSION_AFTER_OPERATOR = 8;
@@ -160,6 +162,7 @@
 		{
 			$trace = debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS);
 			$this->trace = $trace[0];
+			$this->_state = $this->state;
 			$this->state = self::STATE_PARSE_ERROR;
 		}
 		
@@ -403,7 +406,13 @@
 		{
 			if($this->_attr_name !== null)
 			{
-				$this->attributes[$this->_attr_name] = $this->_attr_value;
+				if(count($this->_expression)) {
+					$this->attributes[$this->_attr_name] = $this->_expression;
+					$this->_expression = Array();
+				} else {
+					$this->attributes[$this->_attr_name] = $this->_attr_value;
+				}
+				
 				$this->_attr_name = null;
 				$this->_attr_value = null;
 			}
@@ -737,6 +746,11 @@
 							}
 						}
 						
+						if($c === '$') {
+							$this->state = self::STATE_VALUE_VAR;
+							continue;
+						}
+						
 						if($c === '"')
 						{
 							$this->state = self::STATE_VALUE_STRING;
@@ -748,6 +762,19 @@
 							$this->_attr_value .= $c;
 							continue;
 						}
+						
+						if($c === '.') {
+							// Array syntax: xyz=foo.bar
+							// @TODO
+							continue;
+						}
+						
+						/*
+						if($c === '$') {
+							$this->switchState(self::STATE_EXPRESSION);
+							continue;
+						}
+						*/
 						
 						$this->error();
 					break;
@@ -799,6 +826,49 @@
 						$this->_string .= $c;
 						
 						//$this->error();
+					break;
+					
+					case self::STATE_VALUE_VAR :
+						if(ctype_space($c))
+						{
+							$this->checkAppendOperand();
+							$this->checkAppendAttribute();
+							$this->state = self::STATE_BEGIN;
+							continue;
+						}
+						// probably end of var - an operator might follow
+						elseif($this->find('->'))
+						{
+							$this->i++;
+							$this->checkAppendOperand();
+							$this->_var_type = 'object';
+							continue;
+						}
+						elseif($c === '.')
+						{
+							$this->checkAppendOperand();
+							$this->_var_type = 'array';
+							continue;
+						}
+						
+						if($this->_var === null)
+						{
+							if(ctype_alpha($c) || $c === '_')
+							{
+								$this->_var .= $c;
+								continue;
+							}
+						}
+						else
+						{						
+							if(ctype_alnum($c) || $c === '_')
+							{
+								$this->_var .= $c;
+								continue;
+							}
+						}
+						
+						$this->error();
 					break;
 					
 					/**
