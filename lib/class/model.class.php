@@ -44,6 +44,10 @@
 			return Array('msg' => $this->error[2], 'code' => $this->error[1]);
 		}
 		
+		public function clear() {
+			$this->select = null;
+		}
+		
 		/*
 		public function getManipulator($offset = 0)
 		{
