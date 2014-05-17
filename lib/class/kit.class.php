@@ -71,11 +71,11 @@
 			
 			if(isset($_SERVER['REQUEST_URI']))
 			{
-				$this->url = $_SERVER['REQUEST_URI'];
+				$this->url = urldecode($_SERVER['REQUEST_URI']);
 			}
 			elseif(isset($_SERVER['REDIRECT_URL']))
 			{
-				$this->url = $_SERVER['REDIRECT_URL'];
+				$this->url = urldecode($_SERVER['REDIRECT_URL']);
 			}
 			else
 			{
