@@ -266,6 +266,7 @@
 			if($this->view !== null)
 			{
 				$this->view->BASE = PATH_WWW;
+				$this->view->HOST = $_SERVER['HTTP_HOST'];
 				$this->view->PATH = $this->path;
 				$this->view->LANG = lang::getLanguage();
 				$this->view->URL = $this->getControllerURL();
