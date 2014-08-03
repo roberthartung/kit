@@ -20,6 +20,7 @@
 			
 			$q .= ' FROM '.$this->from;
 			
+			
 			if($this->from_alias !== null)
 			{
 				$q .= ' as '.$this->from_alias;
@@ -43,7 +44,10 @@
 						$k = substr($k,1);
 					}
 					
-					if($k[0] === '%')
+					if(is_int($k)) {
+						$where[] = $v;
+					}
+					else if($k[0] === '%')
 					{
 						$where[] = substr($k,1)." LIKE '".$v."%'";
 					}
