@@ -116,7 +116,7 @@
 		
 		public static function getLanguage()
 		{
-			return self::$language == null ? self::$best_language : self::$language;
+			return self::$language == null ? (self::$best_language == null ? 'de' : self::$best_language) : self::$language;
 		}
 		
 		public function getUserLanguage() {
