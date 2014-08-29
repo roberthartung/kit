@@ -16,7 +16,10 @@
 			
 			foreach($expr AS $exp)
 			{
-				if(isset($exp['op']))
+				if(isset($exp['function_name'])) {
+					$expr_str .= $exp['function_name'];
+				}
+				elseif(isset($exp['op']))
 				{
 					$expr_str .= ' '.$exp['op'].' ';
 				}

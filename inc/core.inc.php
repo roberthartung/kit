@@ -22,12 +22,24 @@
 	
 	unset($files);
 	
-	set_include_path(get_include_path().PATH_SEPARATOR.
-		PATH_SITE_ROOT.'lib'.DIRECTORY_SEPARATOR.PATH_SEPARATOR.
-		PATH_KIT_ROOT.'lib'.DIRECTORY_SEPARATOR);
+	if(PHP_VERSION < "5.4" || true) {
+		set_include_path(get_include_path().PATH_SEPARATOR.
+			PATH_SITE_ROOT.'lib'.DIRECTORY_SEPARATOR.PATH_SEPARATOR.
+			PATH_KIT_ROOT.'lib53'.DIRECTORY_SEPARATOR.PATH_SEPARATOR.
+			PATH_KIT_ROOT.'lib'.DIRECTORY_SEPARATOR);
+	} else {
+		set_include_path(get_include_path().PATH_SEPARATOR.
+			PATH_SITE_ROOT.'lib'.DIRECTORY_SEPARATOR.PATH_SEPARATOR.
+			PATH_KIT_ROOT.'lib'.DIRECTORY_SEPARATOR.PATH_SEPARATOR.
+			PATH_KIT_ROOT.'base54'.DIRECTORY_SEPARATOR);
+	}
 	
 	function __kit_autoload($class)
 	{
+		if(strpos($class, 'PHPExcel') === 0 || strpos($class, 'Facebook') === 0) {
+			return;
+		}
+		
 		// This function will only load classes from kit namespace
 		if(strpos($class,'kit\\') !== 0)
 		{
@@ -95,7 +107,7 @@
 		
 		$url = $suffix.DIRECTORY_SEPARATOR.strtolower($class).'.'.$suffix.'.php';
 		
-		if(!file_exists(PATH_SITE_ROOT.'lib'.DIRECTORY_SEPARATOR.$url) && !file_exists(PATH_KIT_ROOT.'lib'.DIRECTORY_SEPARATOR.$url))
+		if(!file_exists(PATH_SITE_ROOT.'lib'.DIRECTORY_SEPARATOR.$url) && !file_exists(PATH_KIT_ROOT.'lib'.DIRECTORY_SEPARATOR.$url) && !file_exists(PATH_KIT_ROOT.'lib53'.DIRECTORY_SEPARATOR.$url))
 		{
 			throw new kit\fileNotFoundException($url);
 		}

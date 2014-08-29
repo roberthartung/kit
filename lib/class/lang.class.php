@@ -3,10 +3,8 @@
 		
 	use SimpleXMLElement;
 	
-	final class lang
+	final class lang extends base\lang
 	{
-		use singletonTrait;
-		
 		private static $languages = Array();
 		
 		private static $language = null;
@@ -24,7 +22,6 @@
 		public function __set($key, $value)
 		{
 			if(empty($key)) {
-				var_dump(self::getLanguage());
 				throw new \Exception;
 			}
 			$this->$key = $value;
@@ -123,7 +120,7 @@
 		}
 		
 		public function getUserLanguage() {
-			if(!isset($_SERVER['HTTP_ACCEPT_LANGUAGE'])) {
+			if(!isset($_SERVER['HTTP_ACCEPT_LANGUAGE'])/* || true*/) {
 				return;
 			}
 			

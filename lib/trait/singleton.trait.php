@@ -6,9 +6,9 @@
 		
 		public static function getInstance()
 		{
-			if(!self::$instance instanceof self)
+			if(!self::$instance instanceof static)
 			{
-				self::$instance = new self;
+				self::$instance = new static;
 			}
 			
 			return self::$instance;

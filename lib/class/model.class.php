@@ -8,9 +8,9 @@
   use kit\db\query\update;
   use PDOStatement;
   
-	class model implements modelInterface
+	class model extends base\model implements modelInterface
 	{
-		use loaderTrait { __construct as loader; }
+		// use loaderTrait { __construct as loader; }
 		
 		protected $query;
 		

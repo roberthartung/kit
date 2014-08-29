@@ -2,13 +2,11 @@
 	namespace kit\template;
 	
 	use Exception;
-	use kit\loaderTrait;
 	use kit\template;
 	
+	//  extends \kit\base\template\includeCommand
 	class includeCommand
 	{
-		use loaderTrait {	__construct as loader;}
-		
 		private $attr;
 		
 		private $file_path;
@@ -53,7 +51,7 @@
 			
 			$path = addslashes($path);
 			
-			$code .= " echo (new kit\\template(\"".$path.(isset($this->attr[0]) ? $this->attr[0] : '".$'.$this->attr['_expression'][0]['var'].'."' ).".tpl\"))->get(\$data, Array(".implode(',', $additional_vars)."));";
+			$code .= " \$tpl = new kit\\template(\"".$path.(isset($this->attr[0]) ? $this->attr[0] : '".$'.$this->attr['_expression'][0]['var'].'."' ).".tpl\"); echo \$tpl->get(\$data, Array(".implode(',', $additional_vars).")); unset(\$tpl); ";
 			
 			/*
 			$template = new template();

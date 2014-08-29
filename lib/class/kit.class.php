@@ -12,10 +12,8 @@
 	use Exception;
 	use SimpleXMLElement;
 	
-	class kit
+	class kit extends base\kit
 	{
-		use singletonTrait;
-		
 		/**
 		 * Keeps the current request URL
 		 * 
@@ -193,7 +191,6 @@
 					//return false;
 					break;
 				}
-				//var_dump($part, $_part);
 				
 				if($part[0] == '%')
 				{
@@ -205,7 +202,7 @@
 					
 					$parameters[] = $_part;
 				}
-				elseif($part !== $_part)
+				elseif($part != $_part)
 				{
 					//return false;
 					break;

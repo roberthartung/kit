@@ -5,10 +5,8 @@
 	use Exception;
 	use kit\db\queryException;
 	
-	class db
+	class db extends base\db
 	{
-		use loaderTrait { __construct as loader; }
-		
 		private $conn;
 		
 		private $charset = 'utf8';

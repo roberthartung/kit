@@ -5,11 +5,11 @@
 	
 	use kit\template\templateNotFoundException;
 	
-	final class template
+	final class template extends base\template
 	{
 		//use templateTrait;
 		
-		use loaderTrait { __construct as loader; }
+		// use loaderTrait { __construct as loader; }
 		
 		private $content;
 		

@@ -1,14 +1,13 @@
 <?php
 	namespace kit\template;
 	
-	use kit\singletonTrait;
 	use Exception;
 	
 	/**
 	 * Internally used class for pasing bracket expressions
 	 */
 	
-	class bracket_stack 
+	class bracket_stack
 	{
 		private $parent;
 		
@@ -48,10 +47,8 @@
 		}
 	}
 	
-	class parser
+	class parser extends \kit\base\template\parser
 	{
-		use singletonTrait;
-		
 		const STATE_PARSE_ERROR = 0;
 		
 		const STATE_COMMAND_BEGIN = 1;
@@ -145,6 +142,12 @@
 			return $str;
 		}
 		
+		/**
+		 * Find operator
+		 * 
+		 * @return boolean Operator found or false
+		 */
+		
 		private function is_operator()
 		{
 			foreach($this->operators AS $op)
@@ -158,6 +161,10 @@
 			return false;
 		}
 		
+		/**
+		 * Throw error
+		 */
+		
 		private function error()
 		{
 			$trace = debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS);
@@ -165,6 +172,16 @@
 			$this->_state = $this->state;
 			$this->state = self::STATE_PARSE_ERROR;
 		}
+		
+		/**
+		 * Parses a template string
+		 * 
+		 * @param $template		Template Contents
+		 * @param $file_path	File Path
+		 * @param $file_name	File Name
+		 * 
+		 * return Parsed Template
+		 */
 		
 		public function parse($template, $file_path, $file_name)
 		{
@@ -273,11 +290,19 @@
 		}
 		*/
 		
+		/**
+		 * Switches the state
+		 */
+		
 		private function switchState($state)
 		{
 			$this->state = $state;
 			$this->i--;
 		}
+		
+		/**
+		 * Checks if the operator needs to be appended
+		 */
 		
 		private function checkAppendOperator()
 		{
@@ -299,6 +324,10 @@
 				$this->_op = null;
 			}
 		}
+		
+		/**
+		 * Check if the operand needs to be appended
+		 */
 		
 		private function checkAppendOperand($state = null)
 		{
@@ -402,6 +431,10 @@
 			*/
 		}
 		
+		/**
+		 * Appends an attribute to the expression
+		 */
+		
 		private function checkAppendAttribute()
 		{
 			if($this->_attr_name !== null)
@@ -418,14 +451,22 @@
 			}
 		}
 		
+		/**
+		 * Called at an opening bracket
+		 */
+		
 		private function openingBracket()
 		{
 			if($this->_bracket_stack === null)
 			{
 				// current stack was done and we had a top stack before, then we're adding 
-				
 				$this->_bracket_stack_top = new bracket_stack(null);
 				$this->_bracket_stack = $this->_bracket_stack_top;
+				if($this->_attr_name != null) {
+					// Append Function Name
+					$this->_expression[] = Array('function_name' => $this->_attr_name);
+					$this->_attr_name = null;
+				}
 			}
 			else
 			{
@@ -442,6 +483,10 @@
 			
 			//echo "\t", spl_object_hash($this->_bracket_stack);
 		}
+		
+		/**
+		 * Called at an closing bracket
+		 */
 		
 		private function closingBracket()
 		{
@@ -473,6 +518,10 @@
 			return true;
 		}
 		
+		/**
+		 * Appends the var
+		 */
+		
 		private function checkAppendVar()
 		{
 			if(isset($this->attributes['_var']['var']))
@@ -485,6 +534,14 @@
 			}
 			$this->_var = null;
 		}
+		
+		/**
+		 * Actual parsing of the string
+		 * 
+		 * @param $str			Template String
+		 * 
+		 * @return Parsed String
+		 */
 		
 		public function _parse($str)
 		{
